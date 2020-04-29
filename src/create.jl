@@ -100,3 +100,12 @@ function get_struct_constructor(esc_T)
     end
 end
 
+
+function initialize_struct(esc_T, esc_args_field, esc_args_defaultvalue, esc_args_type)
+    return quote
+        # initialize the struct using names, values, types method
+        $esc_T($esc_args_field, $esc_args_defaultvalue, $esc_args_type)
+    end
+end
+
+

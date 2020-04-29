@@ -39,3 +39,45 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
     end
     return out
 end
+
+function get_struct_interface(esc_T)
+    return quote
+        Base.getproperty(vs::$esc_T, fieldname::Symbol)= getfield(vs, :fieldtable)[fieldname].value
+        Base.getproperty(vs::$esc_T, fieldname::String)= getfield(vs, :fieldtable)[fieldname].value
+
+        function Base.setproperty!(vs::$esc_T, fieldname::Symbol, value)
+            fieldtable = getfield(vs, :fieldtable)
+
+            if haskey(fieldtable, fieldname)
+                # Type conversion - checks for the type errors too
+                value_converted = convert(fieldtable[fieldname].type, value)
+
+                # Setting the fields
+                fieldtable[fieldname].value = value_converted
+            else
+                # new field without type
+                fieldtable[fieldname] = Props(value, typeof(value))
+            end
+
+            return vs
+        end
+        function Base.setproperty!(vs::$esc_T, fieldname::String, value)
+
+            if haskey(fieldtable, fieldname)
+                # Type conversion - checks for the type errors too
+                value_converted = convert(fieldtable[fieldname].type, value)
+
+                # Setting the fields
+                fieldtable[fieldname].value = value_converted
+            else
+                # new field without type
+                fieldtable[fieldname] = Props(value, typeof(value))
+            end
+
+            return vs
+        end
+
+        Base.fieldnames(vs::$esc_T) = collect(keys(getfield(vs, :fieldtable)))
+
+    end # end quote
+end

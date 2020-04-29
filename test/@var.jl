@@ -69,7 +69,7 @@
 end
 
 @testset "struct" begin
-    person = @var struct Person
+    person = @var struct Person2
             name::String
             number::Float64 = 20.0
         end
@@ -93,31 +93,31 @@ end
     @test fieldnames(person) == [:initial, :name, :number]
 
 
-    animal = @var struct Animal
+    animal = @var struct Animal2
                 name::String
                 number::Int64
             end
 
 
     # Dispatch
-    function info(x::Person)
+    function info(x::Person2)
         println("Their home is city")
         return x.name
     end
 
-    function info(x::Animal)
+    function info(x::Animal2)
         println("Their home is jungle")
         return x.name
     end
 
     # alternative way of getting instance
-    person = Person(Dict(
+    person = Person2(Dict(
         :name => Props("Amin"),
         :number => Props(20.0),
     ))
 
     # alternative way of getting instance
-    animal = Animal([:name, :number], ["lion", 10])
+    animal = Animal2([:name, :number], ["lion", 10])
 
     @test info(person) == "Amin"
     @test info(animal) == "lion"

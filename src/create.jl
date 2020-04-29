@@ -82,13 +82,26 @@ function get_struct_interface(esc_T)
     end # end quote
 end
 
-function get_struct_constructor(modul, esc_T)
+function get_struct_constructor(modul, T)
+    T_definition = Symbol(T , "__definition__")
+    esc_T = esc(T)
     return quote
-
         # kw method
         function $esc_T(; args...)
-            # TODO should we check for the types here?
-            fieldtable = FieldTable( n => Props(v) for (n, v) in args)
+            # Type Checking for already defined fields
+            fieldtable = getfield(getfield($modul, $T_definition), :fieldtable)
+            for (fieldname, value) in args
+                if haskey(fieldtable, fieldname)
+                    # Type conversion - checks for the type errors too
+                    value_converted = convert(fieldtable[fieldname].type, value)
+
+                    # Setting the fields
+                    fieldtable[fieldname].value = value_converted
+                else
+                    # new field without type
+                    fieldtable[fieldname] = Props(value, typeof(value))
+                end
+            end
             return $esc_T(fieldtable)
         end
     end

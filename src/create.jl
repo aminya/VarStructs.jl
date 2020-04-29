@@ -81,3 +81,22 @@ function get_struct_interface(esc_T)
 
     end # end quote
 end
+
+function get_struct_constructor(esc_T)
+    return quote
+
+        # fieldtable method:
+        # function $esc_T(args...)
+        #     fieldtable = FieldTable(args...)
+        #     return $esc_T(fieldtable)
+        # end
+
+        # names, values, types method
+        function $esc_T(names::AbstractVector, values::AbstractVector, types::AbstractVector{DataType} = typeof.(values))
+            fieldtable = FieldTable( n => Props(v, t) for (n, v, t) in zip(names, values, types))
+            return $esc_T(fieldtable)
+        end
+
+    end
+end
+

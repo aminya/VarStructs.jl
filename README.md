@@ -125,14 +125,14 @@ julia> info(animal)
 
 
 # Custom Constructor
-To define a custom constructor return an instance using one of the above methods:
+To define a custom constructor return an instance using keyword method:
 ```julia
 function Person(name, number)
-    return Person(Dict(
-        :name => Props(name),
-        :number => Props(number),
-        :initial => Props(name[1]),
-    ))
+    return Person(
+        name = name,
+        number = number,
+        initial = name[1],
+    )
 end
 
 Person("Amin", 20.0)

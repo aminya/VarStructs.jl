@@ -6,12 +6,13 @@ end
 
 function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, args_type)
     esc_T = esc(T)
+    T_declaration = Symbol("___", T , "_declaration___")
 
     if isdefined(modul, T) && isa(getfield(modul, T), Type)
         # if already defined don't define it again
         out = quote
             # Struct Initialization (returns an instance)
-            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type), T_declaration))
         end
     else
         strdef = :(mutable struct $T
@@ -27,13 +28,14 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
             $(get_struct_interface(esc_T))
 
             # Struct Constructor
-            $(get_struct_constructor(modul, esc_T))
+            $(get_struct_constructor(modul, T, T_declaration))
 
             # Show
             $(show_struct(esc_T))
 
             # Struct Initialization (returns an instance)
-            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
+            # @eval $modul $strinit
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type), T_declaration))
         end
 
     end
@@ -82,24 +84,38 @@ function get_struct_interface(esc_T)
     end # end quote
 end
 
-function get_struct_constructor(modul, esc_T)
+function get_struct_constructor(modul, T, T_declaration)
+    T_declaration = QuoteNode(T_declaration)
+    esc_T = esc(T)
     return quote
-
         # kw method
         function $esc_T(; args...)
-            # TODO should we check for the types here?
-            fieldtable = FieldTable( n => Props(v) for (n, v) in args)
+            # Type Checking for already defined fields
+            fieldtable = getfield(getfield($modul, $T_declaration), :fieldtable)
+            for (fieldname, value) in args
+                if haskey(fieldtable, fieldname)
+                    # Type conversion - checks for the type errors too
+                    value_converted = convert(fieldtable[fieldname].type, value)
+
+                    # Setting the fields
+                    fieldtable[fieldname].value = value_converted
+                else
+                    # new field without type
+                    fieldtable[fieldname] = Props(value, typeof(value))
+                end
+            end
             return $esc_T(fieldtable)
         end
     end
 end
 
 
-function initialize_struct(modul, T, esc_args_field, esc_args_defaultvalue, esc_args_type)
+function initialize_struct(modul, T, esc_args_field, esc_args_defaultvalue, esc_args_type, T_declaration)
+    esc_T_declaration = esc(T_declaration)
     return quote
         # initialize the struct
 
-        $modul.$T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
+        $esc_T_declaration = $modul.$T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
     end
 end
 
@@ -112,14 +128,11 @@ function show_struct(esc_T)
             # iArg = 1
             arg_show_all = ""
             for (name, props) in fieldtable
-                arg_show_all = arg_show_all * "\t $name::$(props.type) = $(props.value), \n"
+                arg_show_all = arg_show_all * "    $name::$(props.type) = $(props.value), \n"
                 # iArg = iArg+1
             end
 
-            out = """
-            $($esc_T)(
-                $arg_show_all)
-            """
+            out = "$($esc_T)(\n$arg_show_all)"
             return print(io, out)
         end
     end

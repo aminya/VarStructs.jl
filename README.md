@@ -1,11 +1,11 @@
 # VarStructs
 
-[![Build Status](https://github.com/aminya/VarStructs.jl/workflows/CI/badge.svg)](https://github.com/aminya/VarStructs.jl/actions)
+![CI](https://github.com/aminya/VarStructs.jl/workflows/CI/badge.svg)
 
 # Features
 
 VarStructs are similar to struct but have extra features:
-  - You can fields to the VarStruct after its definition.
+  - You can add fields after their definition.
   - They can be defined inside a function or a local scope.
   - They can be redefined.
 
@@ -44,7 +44,7 @@ In this syntax, you **should** provide the initial values for the fields. Provid
 
 # Getting an Instance
 
-Two syntax that used for declaration also return an instance of the VarStruct. So if you need an instance right away you can:
+The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can:
 ```julia
 animal = @var Animal(
         name = "lion",
@@ -52,13 +52,13 @@ animal = @var Animal(
     )
 
 # redefinition of `Animal` returns a new instance:
-animal2 = @var Person(
+animal2 = @var Animal(
         name = "dog",
         number::Int64 = 1,
     )
 ```
 
-There are two alternative syntax for getting an instance:
+There are two alternative syntaxes for getting an instance:
 ```julia
 # names, values method:
 animal = Animal([:name, :number], ["lion", 10])
@@ -112,7 +112,7 @@ julia> info(animal)
 
 
 # Custom Constructor
-To define a custom constructor return an instance using one the above methods:
+To define a custom constructor return an instance using one of the above methods:
 ```julia
 function Person(name, number)
     return Person(Dict(
@@ -126,4 +126,4 @@ Person("Amin", 20.0)
 ```
 
 
-This type will be used in the developing of a pckage called JuliaSON which aims to provide data serialization with Julia syntax.
+This type will be used in the developing of a package called JuliaSON which aims to provide data serialization with Julia syntax.

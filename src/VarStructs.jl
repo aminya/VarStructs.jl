@@ -1,5 +1,7 @@
 module VarStructs
 
+export @var, Props
+
 """
 type of the field names
 
@@ -38,6 +40,41 @@ ft = FieldTable( :Amin => Props(20.0, Float64) )
 ```
 """
 FieldTable = Dict{Name, Props}
+
+################################################################
+include("parse.jl")
+include("create.jl")
+
+################################################################
+macro var(expr)
+    expr = macroexpand(__module__, expr) # to expand literal macros and @static
+    # expr = macroexpand(@__MODULE__, expr) # for functions debuging.
+
+    #  check if @var is used before struct
+    if expr isa Expr && expr.head == :struct
+
+        # expr.args[3] # arguments
+        expr.args[3], args_field, args_defaultvalue, args_type, args_param, args_check, is_struct_mutable, T = varstruct_struct_parse(__module__, expr)
+
+    #  check if @var  is used before call
+    elseif expr isa Expr && expr.head == :call
+
+        expr, args_field, args_defaultvalue, args_type, args_param, T = varstruct_call_parse(__module__, expr)
+
+    else
+        error("Invalid usage of @var")
+    end
+
+    # check if the field name is a defined type
+    for arg_field in args_field
+        if isdefined(__module__, arg_field) && isa(getfield(__module__, arg_field), Type)
+            @error "Change the field name `$arg_field` in struct `$T` to something else. The name conflicts with an already defined type name." _module = __module__  _file =__source__.file  _line = __source__.line
+        end
+    end
+
+    return varstruct_construct(__module__, T, args_field, args_defaultvalue, args_type)
+end
+
 
 
 

@@ -109,3 +109,23 @@ function initialize_struct(esc_T, esc_args_field, esc_args_defaultvalue, esc_arg
 end
 
 
+function show_struct(esc_T)
+    return quote
+        function Base.show(io::IO, vs::$esc_T)
+            fieldtable = getfield(vs, :fieldtable)
+            # arg_show = Vector{String}(undef, length(fieldtable))
+            # iArg = 1
+            arg_show_all = ""
+            for (name, props) in fieldtable
+                arg_show_all = arg_show_all * "\t $name::$(props.type) = $(props.value), \n"
+                # iArg = iArg+1
+            end
+
+            out = """
+            $($esc_T)(
+                $arg_show_all)
+            """
+            return print(io, out)
+        end
+    end
+end

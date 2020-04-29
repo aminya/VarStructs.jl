@@ -27,7 +27,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
             $(get_struct_interface(esc_T))
 
             # Struct Constructor
-            $(get_struct_constructor(esc_T))
+            $(get_struct_constructor(modul, esc_T))
 
             # Show
             $(show_struct(esc_T))
@@ -82,9 +82,13 @@ function get_struct_interface(esc_T)
     end # end quote
 end
 
-function get_struct_constructor(esc_T)
+function get_struct_constructor(modul, esc_T)
     return quote
 
+        # kw method
+        function $esc_T(; args...)
+            # TODO should we check for the types here?
+            fieldtable = FieldTable( n => Props(v) for (n, v) in args)
             return $esc_T(fieldtable)
         end
     end

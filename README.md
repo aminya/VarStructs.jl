@@ -43,6 +43,12 @@ In this syntax, you **should** provide the initial values for the fields. Provid
 ```
 
 # Getting an Instance
+Use the following syntax for getting an instance:
+```julia
+person = Person(name = "Amin", number = 20.0)
+
+person2 = Person(name = "Amin", number = 20.0, initial = "T") # new field added
+```
 
 The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can:
 ```julia

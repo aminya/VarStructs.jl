@@ -42,8 +42,12 @@
     @test info(person) == "Tim"
     @test info(animal) == "lion"
 
+    # getting an instance
+    person = Person(name = "Amin", number = 20.0)
+
+
     # alternative way of getting instance
-    person = Person(Dict(
+    person2 = Person(Dict(
         :name => Props("Amin"),
         :number => Props(20.0),
     ))
@@ -106,8 +110,12 @@ end
         return x.name
     end
 
+    # getting an instance
+    person = Person2(name = "Amin", number = 20.0)
+    animal = Animal2(name = "lion", number = 2)
+
     # alternative way of getting instance
-    person = Person2(Dict(
+    person2 = Person2(Dict(
         :name => Props("Amin"),
         :number => Props(20.0),
     ))

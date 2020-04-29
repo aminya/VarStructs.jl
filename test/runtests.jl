@@ -1,6 +1,14 @@
-using VarStruct
+using VarStructs
 using Test
 
-@testset "VarStruct.jl" begin
-    # Write your tests here.
+@testset "VarStructs.jl" begin
+
+    @testset "parse" begin
+        include("parse.jl")
+    end
+
+    @testset "@var" begin
+        include("@var.jl")
+    end
+
 end

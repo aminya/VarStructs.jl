@@ -29,6 +29,15 @@ function Props(value::Union{Missing, T}) where T
     return Props{T}(value, T)
 end
 
+"""
+A Dict that maps the field names to field properties
+
+# Examples
+```julia
+ft = FieldTable( :Amin => Props(20.0, Float64) )
+```
+"""
+FieldTable = Dict{Name, Props}
 
 
 

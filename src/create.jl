@@ -11,17 +11,17 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
         # if already defined don't define it again
         out = quote
             # Struct Initialization (returns an instance)
-            $(initialize_struct(esc_T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
         end
     else
-        strdef = :(mutable struct $esc_T
+        strdef = :(mutable struct $T
             fieldtable::FieldTable
         end)
 
         out = quote
 
             # Struct Declaration
-            Core.eval($modul, $strdef)
+            Base.eval($modul, $strdef)
 
             # Struct Interface
             $(get_struct_interface(esc_T))
@@ -33,7 +33,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
             $(show_struct(esc_T))
 
             # Struct Initialization (returns an instance)
-            $(initialize_struct(esc_T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type) ))
         end
 
     end
@@ -95,11 +95,11 @@ function get_struct_constructor(modul, esc_T)
 end
 
 
-function initialize_struct(esc_T, esc_args_field, esc_args_defaultvalue, esc_args_type)
+function initialize_struct(modul, T, esc_args_field, esc_args_defaultvalue, esc_args_type)
     return quote
         # initialize the struct
 
-        $esc_T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
+        $modul.$T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
     end
 end
 

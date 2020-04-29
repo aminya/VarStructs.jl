@@ -58,14 +58,8 @@ animal2 = @var Animal(
     )
 ```
 
-There are two alternative syntaxes for getting an instance:
+There is an alternative syntaxes for getting an instance, which uses a lower level API:
 ```julia
-# names, values method:
-animal = Animal([:name, :number], ["lion", 10])
-
-# names, values, types method:
-animal = Animal([:name, :number], ["lion", 10], ["String", Int64])
-
 # Dict of `name => Props(value, type)`
 person = Person(Dict(
     :name => Props("Amin"),

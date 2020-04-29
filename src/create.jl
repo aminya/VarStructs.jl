@@ -85,26 +85,17 @@ end
 function get_struct_constructor(esc_T)
     return quote
 
-        # fieldtable method:
-        # function $esc_T(args...)
-        #     fieldtable = FieldTable(args...)
-        #     return $esc_T(fieldtable)
-        # end
-
-        # names, values, types method
-        function $esc_T(names::AbstractVector, values::AbstractVector, types::AbstractVector{DataType} = typeof.(values))
-            fieldtable = FieldTable( n => Props(v, t) for (n, v, t) in zip(names, values, types))
             return $esc_T(fieldtable)
         end
-
     end
 end
 
 
 function initialize_struct(esc_T, esc_args_field, esc_args_defaultvalue, esc_args_type)
     return quote
-        # initialize the struct using names, values, types method
-        $esc_T($esc_args_field, $esc_args_defaultvalue, $esc_args_type)
+        # initialize the struct
+
+        $esc_T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
     end
 end
 

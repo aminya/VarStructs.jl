@@ -8,7 +8,6 @@
     @test person.name == "Amin"
     @test person.number == 20.0
 
-
     # setproperty
     person.name = "Tim"
     person.number = 21.0
@@ -48,9 +47,6 @@
         :name => Props("Amin"),
         :number => Props(20.0),
     ))
-
-    # alternative way of getting instance
-    animal = Animal([:name, :number], ["lion", 10])
 
     @test info(person) == "Amin"
     @test info(animal) == "lion"
@@ -115,9 +111,6 @@ end
         :name => Props("Amin"),
         :number => Props(20.0),
     ))
-
-    # alternative way of getting instance
-    animal = Animal2([:name, :number], ["lion", 10])
 
     @test info(person) == "Amin"
     @test info(animal) == "lion"

@@ -12,6 +12,7 @@ VarStructs are similar to struct but have extra features:
 Similar to structs
   - They can be used for dispatching
   - They can have custom constructors
+  - They have type conversion/checking for the fields that are declared
 
 # Install and Usage
 ```julia
@@ -34,7 +35,7 @@ end
 ```
 
 ## Call Syntax
-In this syntax, you **should** provide the initial values for the fields. Providing types for the fields are optional.
+In this syntax, you **should** provide the initial values for the fields. Providing type for the fields are optional (if not provided, it is considered as `Any`).
 ```julia
 @var Person(
         name = "Amin",
@@ -45,12 +46,33 @@ In this syntax, you **should** provide the initial values for the fields. Provid
 # Getting an Instance
 Use the following syntax for getting an instance:
 ```julia
-person = Person(name = "Amin", number = 20.0)
+julia> person = Person(name = "Amin", number = 20.0)
+Person(
+    name::Any = Amin,       
+    number::Float64 = 20.0,
+)
 
-person2 = Person(name = "Amin", number = 20.0, initial = "T") # new field added
+# Type conversion for the fields that were declared
+julia> person2 = Person(name = "Amin", number = 20)  # number is converted to Float64
+Person(
+    name::Any = Amin,       
+    number::Float64 = 20.0,
+)
+
+# Type checking for the fields that were declared
+julia> person2 = Person(name = "Amin", number = "20")
+ERROR: MethodError: Cannot `convert` an object of type String to an object of type Float64
+
+# new field added
+julia> person2 = Person(name = "Amin", number = 20.0, initial = "T")
+Person(
+    initial::String = T,    
+    name::Any = Amin,       
+    number::Float64 = 20.0,
+)
 ```
 
-The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can:
+The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can use the following. Note that in redeclaration you will not get type checking based on the previous declaration.
 ```julia
 animal = @var Animal(
         name = "lion",
@@ -62,15 +84,6 @@ animal2 = @var Animal(
         name = "dog",
         number::Int64 = 1,
     )
-```
-
-There is an alternative syntaxes for getting an instance, which uses a lower level API:
-```julia
-# Dict of `name => Props(value, type)`
-person = Person(Dict(
-    :name => Props("Amin"),
-    :number => Props(20.0, Float64),
-))
 ```
 
 # Accessing, Setting, Adding Fields

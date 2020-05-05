@@ -45,7 +45,7 @@ jobs:
       - name: Running Benchmark
         run: julia --project -e 'include("deps/SnoopCompile/snoopi_bench.jl")'
       - name: Upload all
-        uses: actions/upload-artifact@v2-preview
+        uses: actions/upload-artifact@v2
         with:
           path: ./
 
@@ -55,16 +55,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download all
-        uses: actions/download-artifact@v2-preview
+        uses: actions/download-artifact@v2
       - name: Move the content of the directory to the root
         run: |
           mv -v artifact/* ./
           mv -v artifact/.[^.]* ./
       - name: Discard unrelated changes
         run: |
-          if test -f 'Project.toml'; then
-            git checkout -- 'Project.toml'
-          fi
+          test -f 'Project.toml' && git checkout -- 'Project.toml'
+          git ls-files 'Manifest.toml' | grep . && git checkout -- 'Manifest.toml'
           git diff -w --no-color | git apply --cached --ignore-whitespace && git checkout -- . && git reset && git add -p
       - name: Format precompile_includer.jl
         run: julia --project -e 'using Pkg; Pkg.add("JuliaFormatter"); using JuliaFormatter; format_file("src/precompile_includer.jl")'

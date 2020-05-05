@@ -1,7 +1,11 @@
 module VarStructs
 
-if VERSION < v"1.1"
+if VERSION <= v"1.1"
     isnothing(x) = x == nothing
+end
+if VERSION <= v"1.2.0"
+    @warn("Please upgrade to Julia 1.4 for a better experience")
+    Base.print(io, x::Nothing) = Base.show(io, x)
 end
 
 export @var, Props

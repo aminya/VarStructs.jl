@@ -16,7 +16,7 @@ Similar to structs
 
 # Install and Usage
 ```julia
-using Pkg; Pkg.add(PackageSpec(url = "https://github.com/aminya/VarStructs.jl", rev = "master"))
+using Pkg; Pkg.add("VarStructs")
 ```
 ```julia
 using VarStructs

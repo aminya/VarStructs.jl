@@ -62,7 +62,9 @@ jobs:
           mv -v artifact/.[^.]* ./
       - name: Discard unrelated changes
         run: |
-          git checkout -- Project.toml
+          if test -f 'Project.toml'; then
+            git checkout -- 'Project.toml'
+          fi
           git diff -w --no-color | git apply --cached --ignore-whitespace && git checkout -- . && git reset && git add -p
       - name: Format precompile_includer.jl
         run: julia --project -e 'using Pkg; Pkg.add("JuliaFormatter"); using JuliaFormatter; format_file("src/precompile_includer.jl")'

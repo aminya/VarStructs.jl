@@ -59,8 +59,7 @@ jobs:
         uses: actions/download-artifact@v2
       - name: Move the content of the directory to the root
         run: |
-          mv -v artifact/* ./
-          rm -d -r artifact
+          rsync -a artifact/* ./
       - name: Discard unrelated changes
         run: |
           test -f 'Project.toml' && git checkout -- 'Project.toml'

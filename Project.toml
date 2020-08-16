@@ -1,7 +1,7 @@
 name = "VarStructs"
 uuid = "f7972512-fcde-4f7f-ad6d-ee9cbeb5126f"
 authors = ["Amin Yahyaabadi"]
-version = "0.2.0"
+version = "0.3.0"
 
 [compat]
 julia = "1"

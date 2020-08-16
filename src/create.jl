@@ -22,6 +22,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
         out = quote
 
             # Struct Declaration
+            # we need to eval manually to support definition inside non-toplevel scope (like functions). Otherwise this is not necessary
             Base.eval($modul, $strdef)
 
             # Struct Interface

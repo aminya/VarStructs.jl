@@ -11,4 +11,6 @@ using Test
         include("@var.jl")
     end
 
+    include("../example/schema.jl")
+
 end

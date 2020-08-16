@@ -8,7 +8,7 @@ if VERSION <= v"1.2.0"
     Base.print(io, x::Nothing) = Base.show(io, x)
 end
 
-export @var, Props
+export @var, Props, FieldTable
 
 """
 type of the field names

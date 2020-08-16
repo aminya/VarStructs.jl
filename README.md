@@ -38,6 +38,7 @@ In this syntax, providing initial values and types for the fields are optional.
     number::Int64
 end
 ```
+You can redeclare the struct later, but in redeclaration you will not get type checking based on the previous declaration.
 
 ## Call Syntax
 In this syntax, you **should** provide the initial values for the fields. Providing type for the fields are optional (if not provided, it is considered as `Any`).
@@ -77,7 +78,7 @@ Person(
 )
 ```
 
-The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can use the following. Note that in redeclaration you will not get type checking based on the previous declaration.
+The two syntaxes that are used for declaration also return an instance of the VarStruct. So if you need an instance right away, you can use the following.
 ```julia
 animal = @var Animal(
         name = "lion",

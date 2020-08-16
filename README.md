@@ -4,15 +4,18 @@
 
 # Features
 
-VarStructs are similar to struct but have extra features:
+VarStructs are similar to structs but have extra features:
   - You can add fields after their definition.
   - They can be defined inside a function or a local scope.
   - They can be redefined.
 
 Similar to structs
-  - They can be used for dispatching
+  - They can be used for dispatching (zero-cost)
   - They can have custom constructors
   - They have type conversion/checking for the fields that are declared
+
+
+VarStructs removes the limitations of structs, and so in addition to all the applications of structs, you can use structures in new applications! For example, it can be used to define a "Schema" for your type, or you can used it for serialization of unknown data.
 
 # Install and Usage
 ```julia
@@ -21,6 +24,8 @@ using Pkg; Pkg.add("VarStructs")
 ```julia
 using VarStructs
 ```
+
+If you want to see a full example see [here]( https://github.com/aminya/VarStructs.jl/blob/master/example/schema.jl).
 
 # Declaration
 There are two ways to declare them:
@@ -64,9 +69,9 @@ julia> person2 = Person(name = "Amin", number = "20")
 ERROR: MethodError: Cannot `convert` an object of type String to an object of type Float64
 
 # new field added
-julia> person2 = Person(name = "Amin", number = 20.0, initial = "T")
+julia> person2 = Person(name = "Amin", number = 20.0, initial = "A")
 Person(
-    initial::String = T,    
+    initial::String = A,    
     name::Any = Amin,       
     number::Float64 = 20.0,
 )
@@ -137,6 +142,3 @@ end
 
 Person("Amin", 20.0)
 ```
-
-
-This type will be used in the developing of a package called JuliaSON which aims to provide data serialization with Julia syntax.

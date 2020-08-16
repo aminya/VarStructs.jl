@@ -10,6 +10,8 @@ end
 
 export @var, Props, FieldTable
 
+include("sugar.jl")
+
 """
 type of the field names
 

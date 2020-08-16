@@ -87,7 +87,8 @@ function varstruct_call_parse(modul::Module, expr::Expr)
 
     args_param = Vector{Union{Expr,Symbol}}(undef, argsnum) # Expr(:parameters)[]
     args_field = Vector{Union{Symbol, String}}(undef, argsnum)
-    args_defaultvalue = Vector{Any}(missing, argsnum)
+    args_defaultvalue = Vector{Any}(undef, argsnum)
+    fill!(args_defaultvalue, Unset())
     args_type = Vector{Union{Type, Symbol, Expr}}(undef, argsnum)
 
     for iArg = 1:argsnum # iterating over arguments of each type argument
@@ -171,7 +172,8 @@ function varstruct_struct_parse(modul::Module, expr::Expr)
 
     args_param = Vector{Union{Expr,Symbol}}(undef, argsnum) # Expr(:parameters)[]
     args_field = Vector{Union{Symbol, String}}(undef, argsnum)
-    args_defaultvalue = Vector{Any}(missing, argsnum)
+    args_defaultvalue = Vector{Any}(undef, argsnum)
+    fill!(args_defaultvalue, Unset())
     args_type = Vector{Union{Type, Symbol, Expr}}(undef, argsnum)
     args_check = Vector{Union{Missing, Symbol, Function}}(missing, argsnum)
     # struct_check = Array{Union{Missing, Symbol, Function},0}(missing)

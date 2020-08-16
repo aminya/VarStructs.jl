@@ -1,3 +1,5 @@
+using VarStructs: Props
+
     # Call Syntax
     person = @var Person(
                 name::String = "Amin",
@@ -80,7 +82,7 @@
 
 
     # getproperty
-    @test ismissing(person2.name)
+    @test isunset(person2.name)
     @test person2.number == 20.0
 
 
@@ -121,3 +123,11 @@
 
     @test info(person2) == "Amin"
     @test info(animal2) == "lion"
+
+
+
+    mystruct = @var struct MyStruct
+        x::Int64
+    end
+
+    @test isunset(mystruct.x)

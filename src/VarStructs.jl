@@ -8,9 +8,48 @@ if VERSION <= v"1.2.0"
     Base.print(io, x::Nothing) = Base.show(io, x)
 end
 
-export @var, Props, FieldTable
+export @var, Unset, isunset
 
 include("sugar.jl")
+
+
+"""
+    Unset
+
+The value of a VarStruct field when it is not set yet.
+
+# Examples
+```julia
+mystruct = @var struct MyStruct
+    x::Int64
+end
+
+typeof(mystruct.x) # Unset
+
+```
+"""
+struct Unset end
+
+"""
+  isunset(x)
+
+Returns true if the value of a field is not set yet.
+
+# Examples
+```julia
+mystruct = @var struct MyStruct
+    x::Int64
+end
+
+isunset(mystruct.x) # true
+```
+
+
+```julia
+isunset( Unset() ) # true
+```
+"""
+isunset(x) = isa(x, Unset)
 
 """
 type of the field names
@@ -32,12 +71,12 @@ fp = Props(20.0, Float64)
 ```
 """
 mutable struct Props{T}
-    value::Union{Missing, T} # missing when the value is not provided yet, but the type is known
+    value::Union{Unset, T} # Unset when the value is not provided yet, but the type is known
     type::Type{T}
     # check::Union{Function, Nothing}
 end
 
-function Props(value::Union{Missing, T}) where T
+function Props(value::Union{Unset, T}) where T
     return Props{T}(value, T)
 end
 

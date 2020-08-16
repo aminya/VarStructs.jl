@@ -28,7 +28,7 @@ end
     )
 
     @test args_field == [:name, :number]
-    @test any(args_defaultvalue .== [missing, 20.0])
+    @test any(args_defaultvalue .== [Unset(), 20.0])
     @test args_type == [:String, :Float64]
     @test args_param == [:name, Expr(:kw, :number, 20.0)]
     @test T == :Person

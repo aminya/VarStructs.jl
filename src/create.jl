@@ -12,7 +12,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
         # if already defined don't define it again
         out = quote
             # Struct Initialization (returns an instance)
-            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type), T_declaration))
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, args_type, T_declaration))
         end
     else
         strdef = :(mutable struct $T
@@ -35,7 +35,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
 
             # Struct Initialization (returns an instance)
             # @eval $modul $strinit
-            $(initialize_struct(modul, T, args_field, args_defaultvalue, getfield.(Ref(modul), args_type), T_declaration))
+            $(initialize_struct(modul, T, args_field, args_defaultvalue, args_type, T_declaration))
         end
 
     end
@@ -110,12 +110,18 @@ function get_struct_constructor(modul, T, T_declaration)
 end
 
 
-function initialize_struct(modul, T, esc_args_field, esc_args_defaultvalue, esc_args_type, T_declaration)
+function initialize_struct(modul, T, esc_args_field, args_defaultvalue, args_type, T_declaration)
     esc_T_declaration = esc(T_declaration)
+
+    # we need this because of the special interface that is needed for setting the FieldTable.
+    # we can't just call the constrctor directly due because some default values might not be missing in the declaration
+    # If someday Julia decide to include this in the Base, we can hide this from the workspace.
+    args_type_evaled = _eval.(Ref(modul), args_type)
+    args_defval_evaled = _eval.(Ref(modul), args_defaultvalue)
+
     return quote
         # initialize the struct
-
-        $esc_T_declaration = $modul.$T($(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, esc_args_defaultvalue, esc_args_type))))
+        $esc_T_declaration = $modul.$T( $(FieldTable( n => Props(v, t) for (n, v, t) in zip(esc_args_field, args_defval_evaled, args_type_evaled) )) )
     end
 end
 
@@ -136,4 +142,21 @@ function show_struct(esc_T)
             return print(io, out)
         end
     end
+end
+
+
+"""
+    _eval(modul, inp)
+Evaluate a expression, symbol, or another value. Only used in the initialization of the struct.
+"""
+function _eval(modul::Module, inp::Symbol)
+    return getfield(modul, inp)
+end
+
+function _eval(modul::Module, inp::Expr)
+    return Core.eval(modul, inp)
+end
+
+function _eval(modul::Module, inp)
+    return inp
 end

@@ -11,6 +11,10 @@ using Test
         include("@var.jl")
     end
 
+    @testset "@shared_var" begin
+        include("@shared_var.jl")
+    end
+
     include("../example/schema.jl")
 
 end

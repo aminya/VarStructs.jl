@@ -1,10 +1,10 @@
-function varstruct_construct(modul::Module, T, args_field, args_defaultvalue, args_type)
+function varstruct_construct(modul::Module, T, args_field, args_defaultvalue, args_type, shared_var = false)
     return quote
-        $(get_struct_definition(modul, T, args_field, args_defaultvalue, args_type))
+        $(get_struct_definition(modul, T, args_field, args_defaultvalue, args_type, shared_var))
     end
 end
 
-function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, args_type)
+function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, args_type, shared_var = false)
     esc_T = esc(T)
     T_declaration = Symbol("___", T , "_declaration___")
 
@@ -29,7 +29,7 @@ function get_struct_definition(modul::Module, T, args_field, args_defaultvalue, 
             $(get_struct_interface(esc_T))
 
             # Struct Constructor
-            $(get_struct_constructor(modul, T, T_declaration))
+            $(get_struct_constructor(modul, T, T_declaration, shared_var))
 
             # Show
             $(show_struct(esc_T))
@@ -85,14 +85,22 @@ function get_struct_interface(esc_T)
     end # end quote
 end
 
-function get_struct_constructor(modul, T, T_declaration)
+function get_struct_constructor(modul, T, T_declaration, shared_var = false)
     T_declaration = QuoteNode(T_declaration)
     esc_T = esc(T)
     return quote
         # kw method
         function $esc_T(; args...)
             # Type Checking for already defined fields
-            fieldtable = getfield(getfield($modul, $T_declaration), :fieldtable)
+            fieldtableDeclaration = getfield(getfield($modul, $T_declaration), :fieldtable)
+
+            # shared instance
+            @static if ($shared_var)
+                fieldtable = fieldtableDeclaration
+            else
+                fieldtable = deepcopy(fieldtableDeclaration)
+            end
+
             for (fieldname, value) in args
                 if haskey(fieldtable, fieldname)
                     # Type conversion - checks for the type errors too

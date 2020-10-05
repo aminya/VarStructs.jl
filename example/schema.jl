@@ -1,6 +1,6 @@
 using VarStructs
 
-# use synatx sugar :)
+# use syntax sugar :)
 using VarStructs: U, UN # union and union with nothing
 
 

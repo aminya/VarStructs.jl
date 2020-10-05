@@ -8,7 +8,7 @@ if VERSION <= v"1.2.0"
     Base.print(io, x::Nothing) = Base.show(io, x)
 end
 
-export @var, Unset, isunset
+export @var, @shared_var, Unset, isunset
 
 include("sugar.jl")
 
@@ -95,10 +95,22 @@ include("parse.jl")
 include("create.jl")
 
 ################################################################
+"""
+Create shared var struct instances (calling constructor will mutate the old instances).
+"""
+macro shared_var(expr)
+    # __module__ = @__MODULE__ # for functions debuging.
+    expr = macroexpand(__module__, expr) # to expand literal macros and @static
+    return var(expr, __module__, __source__,  true)
+end
+
 macro var(expr)
     # __module__ = @__MODULE__ # for functions debuging.
     expr = macroexpand(__module__, expr) # to expand literal macros and @static
+    return var(expr, __module__, __source__,  false)
+end
 
+function var(expr, __module__, __source__,  shred_var::Bool = false)
     #  check if @var is used before struct
     if expr isa Expr && expr.head == :struct
 
@@ -121,9 +133,8 @@ macro var(expr)
         end
     end
 
-    return varstruct_construct(__module__, T, args_field, args_defaultvalue, args_type)
+    return varstruct_construct(__module__, T, args_field, args_defaultvalue, args_type, shred_var)
 end
-
 
 
 

@@ -8,14 +8,16 @@ VarStructs are similar to structs but have extra features:
   - You can add fields after their definition.
   - They can be defined inside a function or a local scope.
   - They can be redefined.
+  - Fields can be uninitialized, have default values, etc.
 
 Similar to structs
   - They can be used for dispatching (zero-cost)
   - They can have custom constructors
   - They have type conversion/checking for the fields that are declared
 
-
 VarStructs removes the limitations of structs, and so in addition to all the applications of structs, you can use structures in new applications! For example, it can be used to define a "Schema" for your type, or you can used it for serialization of unknown data.
+
+SharedVarStructs also allows having shared instances for one struct.
 
 # Install and Usage
 ```julia
@@ -143,5 +145,18 @@ end
 
 Person("Amin", 20.0)
 ```
+
+
+# Shared VarStruct
+Using `@shared_var`, you can define make the struct shared. That means calling the constructor for creating a new instance will use the already defined instance as its declaration.
+```julia
+person = @shared_var Citizen(
+            name::String = "Amin",
+            number::Float64 = 20.0,
+        )
+
+person2 = Citizen(name = "Not-Amin", number = 1) # Will make "person" the same as "person2"
+```
+
 
 If you are a geek see here too: [ReadmeGeeks](https://github.com/aminya/VarStructs.jl/blob/master/ReadmeGeeks.md)
